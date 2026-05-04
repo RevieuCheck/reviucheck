@@ -2,91 +2,97 @@
 
 import { motion } from 'framer-motion'
 import { UserPlus, CreditCard, Code, BarChart3 } from 'lucide-react'
+import Stepper, { Step } from '@/components/Stepper'
 
 const steps = [
     {
         icon: UserPlus,
-        title: "1. Sign Up",
-        description: "Create your account and choose the perfect plan for your business needs.",
-        color: "bg-primary/20 text-primary"
+        title: 'Sign Up',
+        description: 'Create your account and choose the perfect plan for your business needs.',
+        color: 'bg-primary/25 text-violet-900 ring-1 ring-primary/30'
     },
     {
         icon: CreditCard,
-        title: "2. Get API Key",
-        description: "Receive your unique API key and admin portal credentials instantly.",
-        color: "bg-secondary/20 text-secondary"
+        title: 'Get API Key',
+        description: 'Receive your unique API key and admin portal credentials instantly.',
+        color: 'bg-secondary/25 text-violet-900 ring-1 ring-secondary/30'
     },
     {
         icon: Code,
-        title: "3. Integrate",
-        description: "Add our simple API to your review form with just 3 lines of code.",
-        color: "bg-tertiary/20 text-tertiary"
+        title: 'Integrate',
+        description: 'Add our simple API to your review form with just 3 lines of code.',
+        color: 'bg-tertiary/25 text-violet-900 ring-1 ring-tertiary/30'
     },
     {
         icon: BarChart3,
-        title: "4. Watch Reviews Transform",
-        description: "See AI analyze, respond, and provide insights automatically.",
-        color: "bg-accent/20 text-accent"
+        title: 'Watch Reviews Transform',
+        description: 'See AI analyze, respond, and provide insights automatically.',
+        color: 'bg-accent/25 text-violet-900 ring-1 ring-accent/30'
     }
 ]
 
 export default function HowItWorks() {
     return (
-        <section id="how-it-works" className="py-20 bg-gradient-to-b from-background to-white">
+        <section id="how-it-works" className="bg-gradient-to-b from-background to-white py-20">
             <div className="container mx-auto px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                     viewport={{ once: true }}
-                    className="text-center mb-16"
+                    className="mb-12 text-center"
                 >
-                    <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                        Get Started in{' '}
-                        <span className="gradient-text">4 Simple Steps</span>
+                    <h2 className="mb-4 text-4xl font-bold md:text-5xl">
+                        Get Started in <span className="gradient-text">4 Simple Steps</span>
                     </h2>
-                    <p className="text-xl text-gray-600">From signup to insights - less than 10 minutes</p>
+                    <p className="text-xl text-gray-600">From signup to insights — less than 10 minutes</p>
                 </motion.div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {steps.map((step, index) => (
-                        <motion.div
-                            key={step.title}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
-                            viewport={{ once: true }}
-                            className="text-center group"
-                        >
-                            <div className="relative">
-                                <div className={`w-24 h-24 mx-auto ${step.color} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                                    <step.icon className="w-10 h-10" />
-                                </div>
-                                {index < steps.length - 1 && (
-                                    <div className="hidden lg:block absolute top-1/2 left-full w-full h-0.5 bg-gradient-to-r from-primary to-secondary transform -translate-y-1/2"></div>
-                                )}
-                            </div>
-                            <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                            <p className="text-gray-600">{step.description}</p>
-                        </motion.div>
-                    ))}
+                <div className="mx-auto max-w-2xl">
+                    <Stepper
+                        className="min-h-0 py-2 sm:aspect-auto md:aspect-auto"
+                        stepCircleContainerClassName="max-w-2xl border-secondary/25 shadow-2xl"
+                        stepContainerClassName="px-4 pt-6 sm:px-6"
+                        contentClassName="px-4 pb-2 sm:px-6"
+                        footerClassName="px-4 pb-6 sm:px-6"
+                        nextButtonText="Next"
+                        backButtonText="Back"
+                    >
+                        {steps.map(step => {
+                            const Icon = step.icon
+                            return (
+                                <Step key={step.title}>
+                                    <div className="flex flex-col items-center gap-4 py-2 text-center md:flex-row md:text-left">
+                                        <div
+                                            className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl ${step.color}`}
+                                        >
+                                            <Icon className="h-8 w-8" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-semibold text-gray-900">{step.title}</h3>
+                                            <p className="mt-1 leading-relaxed text-gray-600">{step.description}</p>
+                                        </div>
+                                    </div>
+                                </Step>
+                            )
+                        })}
+                    </Stepper>
                 </div>
 
-                {/* Code Example */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
                     viewport={{ once: true }}
-                    className="mt-16 bg-gray-900 rounded-2xl p-6 max-w-3xl mx-auto"
+                    className="mx-auto mt-16 max-w-3xl rounded-2xl bg-gray-900 p-6"
                 >
-                    <div className="flex items-center gap-2 mb-4">
-                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                        <span className="text-gray-400 text-sm ml-2">integration.js</span>
+                    <div className="mb-4 flex items-center gap-2">
+                        <div className="h-3 w-3 rounded-full bg-red-500"></div>
+                        <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
+                        <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                        <span className="ml-2 text-sm text-gray-400">integration.js</span>
                     </div>
-                    <pre className="text-green-400 text-sm overflow-x-auto">
+                    <pre className="overflow-x-auto text-sm text-green-400">
                         <code>{`import { ReviuCheck } from 'reviucheck-sdk';
 
 const reviu = new ReviuCheck('YOUR_API_KEY');

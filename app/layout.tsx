@@ -1,5 +1,10 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+import SplashCursorLayer from '@/components/SplashCursorLayer'
+
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   title: 'ReviuCheck - AI-Powered Review Management Platform',
@@ -49,8 +54,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className={cn("font-sans", geist.variable)}>
+      <body className="relative">
+        {/* <SplashCursorLayer /> */}
+        {children}
+      </body>
     </html>
   )
 }

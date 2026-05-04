@@ -24,8 +24,11 @@ export default function Header() {
     }, [])
 
     return (
-        <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
-            }`}>
+        <header
+            className={`fixed top-0 w-full z-50 border-b border-white/30 shadow-sm transition-all duration-300 backdrop-blur-xl ${
+                isScrolled ? 'bg-white/65 shadow-md' : 'bg-white/40'
+            }`}
+        >
             <nav className="container mx-auto px-6 py-4">
                 <div className="flex items-center justify-between">
                     {/* Logo */}
@@ -51,7 +54,7 @@ export default function Header() {
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
-                                className="text-gray-700 hover:text-secondary transition-colors font-medium"
+                                className="text-gray-800 hover:text-secondary transition-colors font-medium"
                             >
                                 {item.name}
                             </motion.a>
@@ -68,7 +71,9 @@ export default function Header() {
 
                     {/* Mobile Menu Button */}
                     <button
-                        className="md:hidden"
+                        type="button"
+                        aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+                        className="md:hidden rounded-lg p-2 text-gray-800 hover:bg-white/50 transition-colors"
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     >
                         {isMobileMenuOpen ? <X /> : <Menu />}
@@ -80,13 +85,13 @@ export default function Header() {
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="md:hidden mt-4 py-4 bg-white rounded-lg shadow-lg"
+                        className="md:hidden mt-4 py-4 rounded-xl border border-white/40 bg-white/80 backdrop-blur-xl shadow-lg"
                     >
                         {navItems.map((item) => (
                             <a
                                 key={item.name}
                                 href={item.href}
-                                className="block px-4 py-2 text-gray-700 hover:bg-primary/20 transition-colors"
+                                className="block px-4 py-2 text-gray-800 hover:bg-primary/15 transition-colors rounded-lg mx-2"
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
                                 {item.name}
