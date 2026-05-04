@@ -9,31 +9,31 @@ const steps = [
         icon: UserPlus,
         title: 'Sign Up',
         description: 'Create your account and choose the perfect plan for your business needs.',
-        color: 'bg-primary/25 text-violet-900 ring-1 ring-primary/30'
+        color: 'bg-gradient-to-br from-primary/20 to-secondary/20 text-secondary ring-1 ring-secondary/30'
     },
     {
         icon: CreditCard,
         title: 'Get API Key',
         description: 'Receive your unique API key and admin portal credentials instantly.',
-        color: 'bg-secondary/25 text-violet-900 ring-1 ring-secondary/30'
+        color: 'bg-gradient-to-br from-secondary/20 to-tertiary/20 text-tertiary ring-1 ring-tertiary/30'
     },
     {
         icon: Code,
         title: 'Integrate',
         description: 'Add our simple API to your review form with just 3 lines of code.',
-        color: 'bg-tertiary/25 text-violet-900 ring-1 ring-tertiary/30'
+        color: 'bg-gradient-to-br from-tertiary/20 to-accent/20 text-accent ring-1 ring-accent/30'
     },
     {
         icon: BarChart3,
         title: 'Watch Reviews Transform',
         description: 'See AI analyze, respond, and provide insights automatically.',
-        color: 'bg-accent/25 text-violet-900 ring-1 ring-accent/30'
+        color: 'bg-gradient-to-br from-accent/20 to-primary/20 text-primary ring-1 ring-primary/30'
     }
 ]
 
 export default function HowItWorks() {
     return (
-        <section id="how-it-works" className="bg-gradient-to-b from-background to-white py-20">
+        <section id="how-it-works" className="relative py-20">
             <div className="container mx-auto px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -51,7 +51,7 @@ export default function HowItWorks() {
                 <div className="mx-auto max-w-2xl">
                     <Stepper
                         className="min-h-0 py-2 sm:aspect-auto md:aspect-auto"
-                        stepCircleContainerClassName="max-w-2xl border-secondary/25 shadow-2xl"
+                        stepCircleContainerClassName="max-w-2xl border-white/40 bg-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.08)] backdrop-blur-xl"
                         stepContainerClassName="px-4 pt-6 sm:px-6"
                         contentClassName="px-4 pb-2 sm:px-6"
                         footerClassName="px-4 pb-6 sm:px-6"

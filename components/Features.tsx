@@ -77,7 +77,7 @@ const carouselItems: CarouselItem[] = features.map((f, i) => {
 
 export default function Features() {
     return (
-        <section id="features" className="bg-white py-20">
+        <section id="features" className="relative py-20">
             <div className="container mx-auto px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -112,13 +112,14 @@ export default function Features() {
                     />
                 </motion.div>
 
-                <div className="mx-auto max-w-6xl overflow-hidden rounded-3xl bg-[#120F17] px-4 py-10 shadow-2xl sm:px-6">
+                <div className="mx-auto max-w-5xl overflow-hidden rounded-[2.5rem] bg-[#120F17]/95 px-4 py-10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] border border-white/10 sm:px-6 relative backdrop-blur-md">
+                    <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-transparent pointer-events-none" />
                     <motion.div
                         initial={{ opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                         viewport={{ once: true }}
-                        className="mb-8 text-center"
+                        className="relative mb-8 text-center"
                     >
                         <h3 className="text-2xl font-bold text-white md:text-3xl">Explore the product surface</h3>
                         <p className="mt-2 text-sm text-white/70 md:text-base">
@@ -136,7 +137,7 @@ export default function Features() {
                     />
                 </div>
 
-                <div className="mx-auto mt-16 grid max-w-6xl gap-8 md:grid-cols-2 lg:grid-cols-4">
+                {/* <div className="mx-auto mt-24 grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-4">
                     {features.map((feature, index) => (
                         <motion.div
                             key={feature.title}
@@ -144,18 +145,19 @@ export default function Features() {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: index * 0.05 }}
                             viewport={{ once: true }}
-                            className="group relative rounded-2xl border border-gray-100 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-2xl"
+                            className="group relative rounded-3xl border border-white/60 bg-white/40 backdrop-blur-xl p-8 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-secondary/20 hover:bg-white/60"
                         >
+                            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/60 to-white/10 pointer-events-none" />
                             <div
-                                className={`mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-r ${feature.color} transition-transform group-hover:scale-110`}
+                                className={`relative mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr ${feature.color} shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}
                             >
                                 <feature.icon className="h-7 w-7 text-white" />
                             </div>
-                            <h3 className="mb-2 text-xl font-semibold">{feature.title}</h3>
-                            <p className="leading-relaxed text-gray-600">{feature.description}</p>
+                            <h3 className="relative mb-3 text-xl font-bold text-gray-900 leading-tight">{feature.title}</h3>
+                            <p className="relative leading-relaxed text-gray-600 font-medium">{feature.description}</p>
                         </motion.div>
                     ))}
-                </div>
+                </div> */}
             </div>
         </section>
     )

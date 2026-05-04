@@ -1,10 +1,20 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Geist } from "next/font/google";
-import { cn } from "@/lib/utils";
-import SplashCursorLayer from '@/components/SplashCursorLayer'
+import { Montserrat, Raleway } from 'next/font/google'
+import { cn } from '@/lib/utils'
+import SmoothScroll from '@/components/SmoothScroll'
 
-const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  display: 'swap',
+})
+
+const raleway = Raleway({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'ReviuCheck - AI-Powered Review Management Platform',
@@ -54,10 +64,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
-      <body className="relative">
-        {/* <SplashCursorLayer /> */}
-        {children}
+    <html lang="en" className={cn("font-sans", raleway.variable, montserrat.variable)}>
+      <body className="relative min-h-screen bg-background">
+        <SmoothScroll>
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   )

@@ -64,7 +64,7 @@ const plans = [
 
 export default function Pricing() {
     return (
-        <section id="pricing" className="py-20 bg-white">
+        <section id="pricing" className="relative py-20">
             <div className="container mx-auto px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

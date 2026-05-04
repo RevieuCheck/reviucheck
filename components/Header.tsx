@@ -25,8 +25,8 @@ export default function Header() {
 
     return (
         <header
-            className={`fixed top-0 w-full z-50 border-b border-white/30 shadow-sm transition-all duration-300 backdrop-blur-xl ${
-                isScrolled ? 'bg-white/65 shadow-md' : 'bg-white/40'
+            className={`fixed top-0 w-full z-50 border-b transition-all duration-500 backdrop-blur-2xl ${
+                isScrolled ? 'bg-white/70 shadow-[0_4px_30px_rgba(0,0,0,0.1)] border-white/50' : 'bg-white/30 border-transparent'
             }`}
         >
             <nav className="container mx-auto px-6 py-4">
@@ -37,7 +37,7 @@ export default function Header() {
                         animate={{ opacity: 1, x: 0 }}
                         className="flex items-center space-x-2"
                     >
-                        <div className="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
+                        <div className="w-10 h-10 bg-gradient-to-tr from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
                             <span className="text-white font-bold text-xl">R</span>
                         </div>
                         <span className="text-2xl font-bold bg-gradient-to-r from-secondary to-tertiary bg-clip-text text-transparent">
@@ -54,16 +54,17 @@ export default function Header() {
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
-                                className="text-gray-800 hover:text-secondary transition-colors font-medium"
+                                className="relative text-gray-800 hover:text-secondary transition-colors font-medium group"
                             >
                                 {item.name}
+                                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full rounded-full" />
                             </motion.a>
                         ))}
                         <motion.a
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             href="#pre-register"
-                            className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg transition-all transform hover:scale-105"
+                            className="bg-gradient-to-r from-primary via-secondary to-tertiary bg-size-200 text-white px-6 py-2.5 rounded-full font-semibold shadow-lg shadow-primary/30 hover:shadow-secondary/50 transition-all transform hover:scale-105 animate-gradient"
                         >
                             Get Early Access
                         </motion.a>
