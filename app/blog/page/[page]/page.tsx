@@ -1,8 +1,10 @@
 import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import PaginatedBlogPage from './PaginatedBlogPage'
+import { blogPosts } from '@/lib/blogCategories'
 
 const POSTS_PER_PAGE = 10
-const TOTAL_POSTS = 50
+const TOTAL_POSTS = blogPosts.length
 const TOTAL_PAGES = Math.ceil(TOTAL_POSTS / POSTS_PER_PAGE)
 
 interface BlogPaginationProps {
@@ -18,6 +20,17 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: BlogPaginationProps): Promise<Metadata> {
   const { page } = await params
   const pageNum = parseInt(page)
+  const isValidPage = Number.isInteger(pageNum) && pageNum >= 1 && pageNum <= TOTAL_PAGES
+
+  if (!isValidPage) {
+    return {
+      title: 'Blog Page Not Found',
+      robots: {
+        index: false,
+        follow: true,
+      },
+    }
+  }
 
   return {
     title: `Blog - Page ${pageNum}`,
@@ -32,6 +45,10 @@ export async function generateMetadata({ params }: BlogPaginationProps): Promise
 export default async function BlogPaginationPage({ params }: BlogPaginationProps) {
   const { page } = await params
   const currentPage = parseInt(page)
+
+  if (!Number.isInteger(currentPage) || currentPage < 1 || currentPage > TOTAL_PAGES) {
+    notFound()
+  }
 
   return (
     <PaginatedBlogPage

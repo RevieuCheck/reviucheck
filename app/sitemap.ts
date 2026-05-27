@@ -1,4 +1,8 @@
 import { MetadataRoute } from 'next'
+import { authors } from '@/lib/authors'
+import { blogPosts } from '@/lib/blogCategories'
+
+const POSTS_PER_PAGE = 10
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://reviucheck.com'
@@ -21,10 +25,41 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: '/api-docs', priority: 0.5, changeFrequency: 'weekly' },
   ]
 
-  return routes.map(route => ({
+  const staticRoutes = routes.map(route => ({
     url: `${baseUrl}${route.url}`,
     lastModified: currentDate,
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }))
+
+  const blogPageRoutes = Array.from(
+    { length: Math.ceil(blogPosts.length / POSTS_PER_PAGE) },
+    (_, i) => ({
+      url: `${baseUrl}/blog/page/${i + 1}`,
+      lastModified: currentDate,
+      changeFrequency: 'daily' as const,
+      priority: 0.8,
+    })
+  )
+
+  const blogPostRoutes = blogPosts.map(post => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.updatedDate || post.date),
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }))
+
+  const authorRoutes = authors.map(author => ({
+    url: `${baseUrl}/author/${author.slug}`,
+    lastModified: currentDate,
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
+  }))
+
+  return [
+    ...staticRoutes,
+    ...blogPageRoutes,
+    ...blogPostRoutes,
+    ...authorRoutes,
+  ]
 }

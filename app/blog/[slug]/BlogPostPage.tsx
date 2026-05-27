@@ -6,19 +6,10 @@ import Link from 'next/link'
 import { getAuthorByName } from '@/lib/authors'
 import { getRelatedPosts } from '@/lib/internalLinks'
 import { blogContent } from '@/lib/blogContent'
-
-interface PostData {
-  slug: string
-  title: string
-  excerpt: string
-  author: string
-  date: string
-  updatedDate: string | null
-  category: string
-}
+import type { BlogPostMeta } from '@/lib/blogCategories'
 
 interface BlogPostPageProps {
-  post: PostData
+  post: BlogPostMeta
 }
 
 export default function BlogPostPage({ post }: BlogPostPageProps) {
@@ -33,6 +24,7 @@ export default function BlogPostPage({ post }: BlogPostPageProps) {
     },
     datePublished: post.date,
     dateModified: post.updatedDate || post.date,
+    keywords: post.topics.join(', '),
     mainEntityOfPage: {
       '@type': 'WebPage',
       '@id': `https://reviucheck.com/blog/${post.slug}`,
@@ -81,7 +73,7 @@ export default function BlogPostPage({ post }: BlogPostPageProps) {
                 </span>
                 <span className="text-sm text-text-muted flex items-center gap-1.5">
                   <Clock className="w-4 h-4" />
-                  5 min read
+                  {post.readTime}
                 </span>
               </div>
 
@@ -104,7 +96,7 @@ export default function BlogPostPage({ post }: BlogPostPageProps) {
                   <div className="text-sm text-text-muted">
                     {post.updatedDate
                       ? `Updated ${new Date(post.updatedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`
-                      : `${post.author} \u00B7 ReviuCheck`}
+                      : `${post.authorRole} \u00B7 ReviuCheck`}
                   </div>
                 </div>
               </div>
