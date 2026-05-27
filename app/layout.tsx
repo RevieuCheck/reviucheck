@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import SmoothScroll from '@/components/SmoothScroll'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const dosis = Dosis({
   subsets: ['latin'],
@@ -88,7 +89,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={cn("font-sans", jost.variable, dosis.variable)}>
+      <head>
+        <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+      </head>
       <body className="relative min-h-screen bg-background text-text-primary">
+        <BreadcrumbSchema />
         <Header />
         <SmoothScroll>
           <main className="min-h-screen">

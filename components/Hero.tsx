@@ -32,12 +32,12 @@ export default function Hero() {
 
               <div className="mb-8 flex flex-wrap gap-8">
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-0.5">
+                  {/* <div className="flex items-center gap-0.5">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="h-4 w-4 fill-secondary text-secondary" />
                     ))}
-                  </div>
-                  <span className="text-sm text-text-secondary">4.9/5 from 500+ businesses</span>
+                  </div> */}
+                  {/* <span className="text-sm text-text-secondary">4.9/5 from 500+ businesses</span> */}
                 </div>
                 <div className="flex items-center gap-2">
                   <Shield className="h-4 w-4 text-primary" />

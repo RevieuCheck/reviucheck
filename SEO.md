@@ -4,9 +4,53 @@
 
 This document captures every SEO enhancement applied to the ReviuCheck website. The goal was to make the site fully indexable, shareable on social media, and compliant with search engine best practices.
 
+All 30 routes are statically prerendered (SSG or static) for maximum crawl efficiency.
+
 ---
 
-## 1. Metadata Architecture
+## 1. Sitemap (`app/sitemap.ts`)
+
+A dynamic sitemap served at `/sitemap.xml` listing all 15 static pages with metadata:
+
+| Route | Priority | Change Frequency |
+|---|---|---|
+| `/` | 1.0 | weekly |
+| `/features` | 0.9 | weekly |
+| `/how-it-works` | 0.9 | weekly |
+| `/pricing` | 0.9 | weekly |
+| `/faq` | 0.8 | monthly |
+| `/about` | 0.7 | monthly |
+| `/blog` | 0.8 | daily |
+| `/careers` | 0.6 | weekly |
+| `/contact` | 0.7 | monthly |
+| `/privacy` | 0.3 | yearly |
+| `/terms` | 0.3 | yearly |
+| `/security` | 0.4 | monthly |
+| `/gdpr` | 0.4 | monthly |
+| `/api-docs` | 0.5 | weekly |
+
+Each entry includes a `lastModified` timestamp set to the build date.
+
+---
+
+## 2. Robots.txt (`public/robots.txt`)
+
+```txt
+User-agent: *
+Allow: /
+Disallow: /api/private/
+Disallow: /admin/
+
+Sitemap: https://reviucheck.com/sitemap.xml
+Host: https://reviucheck.com
+```
+
+- Blocks admin and private API paths from crawling.
+- Points crawlers to the sitemap.
+
+---
+
+## 3. Metadata Architecture
 
 ### Root Layout (`app/layout.tsx`)
 
@@ -19,11 +63,11 @@ title: {
 }
 ```
 
-This means a page exporting `title: 'Features'` renders as `Features | ReviuCheck` in the browser title bar and SERP snippet.
+A page exporting `title: 'Features'` renders as `Features | ReviuCheck` in the browser title bar and SERP snippet.
 
 ### Per-Page Metadata
 
-Every route (`/features`, `/pricing`, `/about`, `/blog`, etc.) exports a `metadata` object from its `page.tsx` with:
+Every route exports a `metadata` object from its `page.tsx` with:
 
 | Field | Purpose |
 |---|---|
@@ -32,12 +76,13 @@ Every route (`/features`, `/pricing`, `/about`, `/blog`, etc.) exports a `metada
 | `keywords` | Relevant comma-separated keywords |
 | `openGraph.title` | Title for social shares (Facebook, LinkedIn, etc.) |
 | `openGraph.description` | Description for social shares |
+| `robots` | Page-level index/follow directives |
 
-**Pages with dedicated metadata:** `/`, `/features`, `/how-it-works`, `/pricing`, `/faq`, `/about`, `/blog`, `/careers`, `/contact`, `/privacy`, `/terms`, `/security`, `/gdpr`, `/api-docs`.
+**Pages with dedicated metadata:** `/`, `/features`, `/how-it-works`, `/pricing`, `/faq`, `/about`, `/blog`, `/blog/page/[page]`, `/blog/[slug]`, `/careers`, `/contact`, `/privacy`, `/terms`, `/security`, `/gdpr`, `/api-docs`, `/not-found`.
 
 ---
 
-## 2. Open Graph & Twitter Cards
+## 4. Open Graph & Twitter Cards
 
 Defined in `app/layout.tsx`:
 
@@ -60,11 +105,11 @@ twitter: {
 },
 ```
 
-Each sub-page also overrides `og:title` and `og:description` for share-context accuracy.
+Blog article pages override og tags with `type: 'article'`, `publishedTime`, and `authors` for rich social previews.
 
 ---
 
-## 3. Robots & Indexing
+## 5. Robots & Indexing
 
 ```ts
 robots: {
@@ -84,21 +129,26 @@ robots: {
 - `follow: true` — allow crawlers to follow all links.
 - `max-snippet: -1` — allow full-length snippets (no truncation).
 
+The 404 page sets `robots: { index: false, follow: true }` to prevent indexing.
+Blog pagination pages > page 3 set `index: false` to avoid thin content indexing.
+
 ---
 
-## 4. Canonical URL
+## 6. Canonical URL
 
-The `metadataBase` is set to `https://reviucheck.com`, which Next.js uses to resolve relative URLs in `<link rel="canonical">` automatically.
+`metadataBase` is set to `https://reviucheck.com`, which Next.js uses to resolve relative URLs in `<link rel="canonical">` automatically.
 
 ```ts
 metadataBase: new URL('https://reviucheck.com'),
 ```
 
+A `<link rel="sitemap" type="application/xml" href="/sitemap.xml" />` is also injected in the `<head>`.
+
 ---
 
-## 5. Structured Data (JSON-LD Schema)
+## 7. Structured Data (JSON-LD Schema)
 
-A `<script type="application/ld+json">` is injected on every page via `app/layout.tsx` (serialized from the `metadata` export) with `SoftwareApplication` schema:
+### SoftwareApplication (All Pages — `components/SEOHead.tsx`)
 
 ```json
 {
@@ -111,20 +161,63 @@ A `<script type="application/ld+json">` is injected on every page via `app/layou
     "@type": "Offer",
     "price": "99",
     "priceCurrency": "USD"
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "ratingCount": "127"
   }
 }
 ```
 
-This qualifies the site for **rich results** (star ratings, pricing) in SERP.
+**Fix applied:** `aggregateRating` is now conditional — only rendered when `NEXT_PUBLIC_SHOW_REAL_RATINGS=true` and real values are provided via env vars:
+```ts
+...(process.env.NEXT_PUBLIC_SHOW_REAL_RATINGS === 'true' && {
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: process.env.NEXT_PUBLIC_RATING_VALUE,
+    ratingCount: process.env.NEXT_PUBLIC_RATING_COUNT,
+  },
+})
+```
+
+This prevents fake review stars from appearing in rich results until real data is available.
+
+### BreadcrumbList (All Sub-Pages — `components/BreadcrumbSchema.tsx`)
+
+A `BreadcrumbList` schema is injected on every page deeper than the homepage via a client component. It automatically reads the URL path and maps segments to human-readable names (e.g. `/how-it-works` → "How It Works"):
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://reviucheck.com" },
+    { "@type": "ListItem", "position": 2, "name": "Features", "item": "https://reviucheck.com/features" }
+  ]
+}
+```
+
+This qualifies pages for breadcrumb rich results in SERP.
+
+### Article (Blog Posts — `app/blog/[slug]/BlogPostPage.tsx`)
+
+Each individual blog post renders an `Article` schema with:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Post Title",
+  "description": "Post excerpt...",
+  "author": { "@type": "Person", "name": "Author Name" },
+  "datePublished": "2026-03-15",
+  "dateModified": "2026-03-15",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://reviucheck.com/blog/post-slug"
+  }
+}
+```
 
 ---
 
-## 6. Font Optimization
+## 8. Font Optimization
 
 Google Fonts (Dosis & Jost) are loaded via `next/font/google` with `display: 'swap'` to prevent layout shift and ensure text remains visible during webfont load:
 
@@ -133,81 +226,108 @@ const dosis = Dosis({
   subsets: ['latin'],
   variable: '--font-heading',
   display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
 })
 const jost = Jost({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
+  weight: ['300', '400', '500', '600', '700'],
 })
 ```
 
 ---
 
-## 7. Performance Optimizations (SEO-Adjacent)
+## 9. Performance Optimizations (SEO-Adjacent)
 
 | Technique | Implementation |
 |---|---|
-| **Zero JS for static pages** | All content pages are static (○ in build output). Zero client JS for SEO content. |
+| **Zero JS for static pages** | All content pages are static (○ or ● SSG). Zero client JS for SEO content. |
 | **Font preloading** | `next/font` inlines critical font data and preloads the rest. |
 | **Semantic HTML** | `<header>`, `<main>`, `<section>`, `<article>`, `<footer>` used throughout. |
 | **Heading hierarchy** | Each page has a single `<h1>` followed by `<h2>`/`<h3>` for logical document outline. |
 | **Alt attributes** | All `<img>` tags include descriptive `alt` text. |
 | **Meta viewport** | `width=device-width, initial-scale=1.0` for mobile usability (SEO ranking factor). |
+| **Static generation** | Blog posts and pagination use `generateStaticParams` for SSG. |
 
 ---
 
-## 8. Internal Linking Structure
+## 10. Internal Linking Structure
 
 - **Header** — links to `/features`, `/how-it-works`, `/pricing`, `/faq`, `/contact` (all internal).
 - **Footer** — links to Product (5), Company (4), and Legal (4) pages, forming a full internal link graph.
 - **Section CTAs** — each home section links to its dedicated page (`/features`, `/pricing`, etc.) with `ArrowRight` icon.
 - **Cross-links** — `/pricing` links to `/faq` and `/contact`; `/features` links to `/pricing`; `/contact` links to `/pricing`.
-
-This distributes page authority across the entire site.
+- **Blog pagination** — Prev/Next links use `rel="prev"` and `rel="next"` attributes. Page number links connect all pagination pages.
 
 ---
 
-## 9. Verification
+## 11. Blog Pagination Structure
+
+- `/blog` redirects (301) to `/blog/page/1`
+- `/blog/page/[page]` — paginated list with 10 posts per page
+- `rel="prev"` and `rel="next"` on adjacent page links
+- Pages > 3 are set to `noindex` to prevent thin content issues
+- `generateStaticParams` pre-renders all 5 pages at build time
+
+---
+
+## 12. 404 Page (`app/not-found.tsx`)
+
+A custom 404 page with:
+- `robots: { index: false }` to prevent indexing
+- Clear navigation options (Return Home, Contact Support)
+- Gradient text for the 404 heading
+- Same dark theme styling for consistent UX
+
+---
+
+## 13. Verification
 
 ```ts
 verification: {
-  google: 'your-google-verification-code',   // Replace with real code
+  google: 'your-google-verification-code',
 }
 ```
 
-Uncomment and insert your Google Search Console verification meta tag content here.
+Replace with your Google Search Console verification code.
 
 ---
 
-## 10. Future Improvements
+## 14. Future Improvements
 
-- [ ] Generate and link an actual `/sitemap.xml` with `lastmod` dates.
-- [ ] Add `breadcrumbList` structured data for deeper pages.
-- [ ] Create a `/blog/[slug]` route with individual article schema (`Article`, `BlogPosting`).
 - [ ] Replace placeholder Open Graph image `/og-image.png` with a real branded image (1200×630).
 - [ ] Add `hreflang` tags for multi-region support if expanding globally.
 - [ ] Submit sitemap to Google Search Console and Bing Webmaster Tools.
 - [ ] Add `noopener noreferrer` on external links.
+- [ ] Set `NEXT_PUBLIC_SHOW_REAL_RATINGS=true` with real rating values when available.
+- [ ] Implement server-side search for blog content.
+- [ ] Add video sitemap for any video content.
+- [ ] Set up Google Analytics / Search Console integration.
 
 ---
 
-## Appendix: Page Inventory
+## Appendix: Full Page Inventory
 
-| Route | Static | Title Template | OG Tags | JSON-LD |
-|---|---|---|---|---|
-| `/` | ✓ | default | ✓ | ✓ |
-| `/features` | ✓ | %s | ✓ | ✓ |
-| `/how-it-works` | ✓ | %s | ✓ | ✓ |
-| `/pricing` | ✓ | %s | ✓ | ✓ |
-| `/faq` | ✓ | %s | ✓ | ✓ |
-| `/about` | ✓ | %s | ✓ | ✓ |
-| `/blog` | ✓ | %s | ✓ | ✓ |
-| `/careers` | ✓ | %s | ✓ | ✓ |
-| `/contact` | ✓ | %s | ✓ | ✓ |
-| `/privacy` | ✓ | %s | ✓ | ✓ |
-| `/terms` | ✓ | %s | ✓ | ✓ |
-| `/security` | ✓ | %s | ✓ | ✓ |
-| `/gdpr` | ✓ | %s | ✓ | ✓ |
-| `/api-docs` | ✓ | %s | ✓ | ✓ |
+| Route | Type | Title Template | OG Tags | JSON-LD | Static |
+|---|---|---|---|---|---|
+| `/` | Static | default | ✓ | SW App + Breadcrumb | ○ |
+| `/features` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
+| `/how-it-works` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
+| `/pricing` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
+| `/faq` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
+| `/about` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
+| `/blog` | Static | %s | ✓ | SW App | ○ (redirects) |
+| `/blog/page/[page]` | SSG | %s | ✓ | SW App + Breadcrumb | ● (5 pages) |
+| `/blog/[slug]` | SSG | %s | ✓ | SW App + Article + Breadcrumb | ● (6 posts) |
+| `/careers` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
+| `/contact` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
+| `/privacy` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
+| `/terms` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
+| `/security` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
+| `/gdpr` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
+| `/api-docs` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
+| `/not-found` | Static | %s | - | - | ○ |
+| `/sitemap.xml` | Static | - | - | - | ○ |
 
-All 15 routes are **statically prerendered** (○) with zero client JavaScript for the page shell, ensuring maximum crawl efficiency.
+**Legend:** ○ = static, ● = SSG (uses `generateStaticParams`), SW App = SoftwareApplication

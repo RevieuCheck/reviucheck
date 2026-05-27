@@ -27,11 +27,13 @@ export default function SEOHead({
               price: '99',
               priceCurrency: 'USD',
             },
-            aggregateRating: {
-              '@type': 'AggregateRating',
-              ratingValue: '4.8',
-              ratingCount: '127',
-            },
+            ...(process.env.NEXT_PUBLIC_SHOW_REAL_RATINGS === 'true' && {
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: process.env.NEXT_PUBLIC_RATING_VALUE,
+                ratingCount: process.env.NEXT_PUBLIC_RATING_COUNT,
+              },
+            }),
           }),
         }}
       />
