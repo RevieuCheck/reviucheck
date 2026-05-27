@@ -1,8 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Calendar, User, Clock, ArrowLeft, Tag } from 'lucide-react'
+import { Calendar, User, Clock, ArrowLeft, Tag, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { getAuthorByName, getAuthorBySlug } from '@/lib/authors'
+import { getRelatedPosts } from '@/lib/internalLinks'
 
 interface PostData {
   slug: string
@@ -35,6 +37,10 @@ export default function BlogPostPage({ post }: BlogPostPageProps) {
       '@id': `https://reviucheck.com/blog/${post.slug}`,
     },
   }
+
+  const authorData = getAuthorByName(post.author)
+  const authorSlug = authorData?.slug || (post.author === 'ReviuCheck Team' ? 'team' : null)
+  const relatedPosts = getRelatedPosts(post.slug, 3)
 
   return (
     <>
@@ -86,9 +92,17 @@ export default function BlogPostPage({ post }: BlogPostPageProps) {
                   {post.author.charAt(0)}
                 </div>
                 <div>
-                  <div className="font-semibold text-text-primary">{post.author}</div>
+                  {authorSlug ? (
+                    <Link href={`/author/${authorSlug}`} className="font-semibold text-text-primary hover:text-primary transition-colors">
+                      {post.author}
+                    </Link>
+                  ) : (
+                    <div className="font-semibold text-text-primary">{post.author}</div>
+                  )}
                   <div className="text-sm text-text-muted">
-                    {post.updatedDate ? `Updated ${new Date(post.updatedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}` : ''}
+                    {post.updatedDate
+                      ? `Updated ${new Date(post.updatedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`
+                      : `${post.author} \u00B7 ReviuCheck`}
                   </div>
                 </div>
               </div>
@@ -98,7 +112,6 @@ export default function BlogPostPage({ post }: BlogPostPageProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="prose prose-invert max-w-none"
             >
               <p className="text-xl text-text-secondary leading-relaxed mb-8">
                 {post.excerpt}
@@ -130,6 +143,34 @@ export default function BlogPostPage({ post }: BlogPostPageProps) {
                 </ul>
               </div>
             </motion.div>
+
+            {relatedPosts.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mt-16 pt-8 border-t border-primary/10"
+              >
+                <h2 className="text-2xl font-bold font-heading text-text-primary mb-6">
+                  Related Articles
+                </h2>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {relatedPosts.map((rp) => (
+                    <Link
+                      key={rp.slug}
+                      href={`/blog/${rp.slug}`}
+                      className="glass rounded-xl p-5 hover:border-primary/30 transition-all duration-300 group"
+                    >
+                      <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full">{rp.category}</span>
+                      <h3 className="text-sm font-bold text-text-primary font-heading mt-2 mb-1 group-hover:text-primary transition-colors line-clamp-2">
+                        {rp.title}
+                      </h3>
+                      <p className="text-xs text-text-secondary line-clamp-2">{rp.excerpt}</p>
+                    </Link>
+                  ))}
+                </div>
+              </motion.div>
+            )}
           </div>
         </div>
       </article>

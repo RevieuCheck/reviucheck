@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
+import { FaLinkedin } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -73,17 +74,28 @@ export default function Header() {
                 </motion.div>
               )
             })}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-            >
-              <Link
-                href="/contact"
-                className="bg-gradient-to-r from-primary to-purple-600 text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all hover:scale-105 animate-glow"
+            <div className="flex items-center gap-3">
+              <a
+                href={process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://linkedin.com/company/reviucheck'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-text-secondary hover:text-primary transition-colors"
+                aria-label="LinkedIn"
               >
-                Get Early Access
-              </Link>
-            </motion.div>
+                <FaLinkedin className="w-5 h-5" />
+              </a>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                <Link
+                  href="/contact"
+                  className="bg-gradient-to-r from-primary to-purple-600 text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all hover:scale-105 animate-glow"
+                >
+                  Get Early Access
+                </Link>
+              </motion.div>
+            </div>
           </div>
 
           <button

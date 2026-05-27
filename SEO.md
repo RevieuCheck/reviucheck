@@ -4,7 +4,7 @@
 
 This document captures every SEO enhancement applied to the ReviuCheck website. The goal was to make the site fully indexable, shareable on social media, and compliant with search engine best practices.
 
-All 30 routes are statically prerendered (SSG or static) for maximum crawl efficiency.
+All 35 routes are statically prerendered (SSG or static) for maximum crawl efficiency.
 
 ---
 
@@ -78,7 +78,7 @@ Every route exports a `metadata` object from its `page.tsx` with:
 | `openGraph.description` | Description for social shares |
 | `robots` | Page-level index/follow directives |
 
-**Pages with dedicated metadata:** `/`, `/features`, `/how-it-works`, `/pricing`, `/faq`, `/about`, `/blog`, `/blog/page/[page]`, `/blog/[slug]`, `/careers`, `/contact`, `/privacy`, `/terms`, `/security`, `/gdpr`, `/api-docs`, `/not-found`.
+**Pages with dedicated metadata:** `/`, `/features`, `/how-it-works`, `/pricing`, `/faq`, `/about`, `/blog`, `/blog/page/[page]`, `/blog/[slug]`, `/careers`, `/contact`, `/privacy`, `/terms`, `/security`, `/gdpr`, `/api-docs`, `/not-found`, `/author/[slug]`.
 
 ---
 
@@ -106,6 +106,7 @@ twitter: {
 ```
 
 Blog article pages override og tags with `type: 'article'`, `publishedTime`, and `authors` for rich social previews.
+Author pages override og with `image` set to the author profile photo.
 
 ---
 
@@ -165,7 +166,7 @@ A `<link rel="sitemap" type="application/xml" href="/sitemap.xml" />` is also in
 }
 ```
 
-**Fix applied:** `aggregateRating` is now conditional — only rendered when `NEXT_PUBLIC_SHOW_REAL_RATINGS=true` and real values are provided via env vars:
+**Fix applied:** `aggregateRating` is now conditional — only rendered when `NEXT_PUBLIC_SHOW_REAL_RATINGS=true`:
 ```ts
 ...(process.env.NEXT_PUBLIC_SHOW_REAL_RATINGS === 'true' && {
   aggregateRating: {
@@ -177,6 +178,37 @@ A `<link rel="sitemap" type="application/xml" href="/sitemap.xml" />` is also in
 ```
 
 This prevents fake review stars from appearing in rich results until real data is available.
+
+### Organization Schema (All Pages — `app/layout.tsx`)
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "ReviuCheck",
+  "url": "https://reviucheck.com",
+  "logo": "https://reviucheck.com/divyaansh.png",
+  "sameAs": [
+    "https://linkedin.com/company/reviucheck",
+    "https://twitter.com/reviucheck"
+  ]
+}
+```
+
+Values are pulled from env vars (`NEXT_PUBLIC_LINKEDIN_URL`, `NEXT_PUBLIC_TWITTER_URL`, `NEXT_PUBLIC_COMPANY_NAME`, `NEXT_PUBLIC_SITE_URL`) with hardcoded fallbacks.
+
+### WebSite Schema (All Pages — `app/layout.tsx`)
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "url": "https://reviucheck.com",
+  "name": "ReviuCheck"
+}
+```
+
+Globally injected alongside Organization schema.
 
 ### BreadcrumbList (All Sub-Pages — `components/BreadcrumbSchema.tsx`)
 
@@ -215,11 +247,54 @@ Each individual blog post renders an `Article` schema with:
 }
 ```
 
+### Person (Author Pages — `app/author/[slug]/AuthorPage.tsx`)
+
+Each author page renders a `Person` schema with:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Divyaansh Tandon",
+  "jobTitle": "Founder & CEO",
+  "description": "...",
+  "image": "https://reviucheck.com/divyaansh.png",
+  "sameAs": ["https://www.linkedin.com/in/divyaansh-tandon/"],
+  "email": "divyaanshtandon09@gmail.com",
+  "telephone": "7223837854"
+}
+```
+
+Author pages for: **Divyaansh Tandon** (Founder & CEO — linkedin, phone, email), ReviuCheck Team, Sarah Chen, Michael Rodriguez, Priya Sharma.
+
 ---
 
-## 8. Font Optimization
+## 8. Author System (`app/author/[slug]/`)
 
-Google Fonts (Dosis & Jost) are loaded via `next/font/google` with `display: 'swap'` to prevent layout shift and ensure text remains visible during webfont load:
+- `lib/authors.ts` — author data store with slug, name, role, bio, image, linkedin, email, phone
+- `app/author/[slug]/page.tsx` — SSG with `generateStaticParams` for 5 authors
+- `app/author/[slug]/AuthorPage.tsx` — displays author photo (`/divyaansh.png`), bio, contact links, articles list
+- Blog posts link author names to their `/author/[slug]` pages
+- **Divyaansh Tandon** shown as Founder & CEO with:
+  - LinkedIn: https://www.linkedin.com/in/divyaansh-tandon/
+  - Phone: 7223837854
+  - Email: divyaanshtandon09@gmail.com
+  - Photo: `/divyaansh.png`
+
+---
+
+## 9. Blog Topical Clusters
+
+- `lib/blogCategories.ts` — `BLOG_TOPICS` constant array (10 topics) + `blogPosts` array with topic tags
+- `lib/internalLinks.ts` — `getRelatedPosts()` helper scoring by shared category (3pts), shared topics (2pts each), same author (1pt)
+- Blog post pages show a **Related Articles** section with 3 pre-computed related posts
+- Related posts are statically determined at build time (no client-side fetching)
+
+---
+
+## 10. Font Optimization
+
+Google Fonts (Dosis & Jost) are loaded via `next/font/google` with `display: 'swap'` to prevent layout shift:
 
 ```ts
 const dosis = Dosis({
@@ -238,7 +313,7 @@ const jost = Jost({
 
 ---
 
-## 9. Performance Optimizations (SEO-Adjacent)
+## 11. Performance Optimizations (SEO-Adjacent)
 
 | Technique | Implementation |
 |---|---|
@@ -247,42 +322,92 @@ const jost = Jost({
 | **Semantic HTML** | `<header>`, `<main>`, `<section>`, `<article>`, `<footer>` used throughout. |
 | **Heading hierarchy** | Each page has a single `<h1>` followed by `<h2>`/`<h3>` for logical document outline. |
 | **Alt attributes** | All `<img>` tags include descriptive `alt` text. |
-| **Meta viewport** | `width=device-width, initial-scale=1.0` for mobile usability (SEO ranking factor). |
-| **Static generation** | Blog posts and pagination use `generateStaticParams` for SSG. |
+| **Meta viewport** | `width=device-width, initial-scale=1.0` for mobile usability. |
+| **Static generation** | Blog, posts, pagination, authors use `generateStaticParams` for SSG. |
 
 ---
 
-## 10. Internal Linking Structure
+## 12. Core Web Vitals Monitoring (`components/PerformanceVitals.tsx`)
 
-- **Header** — links to `/features`, `/how-it-works`, `/pricing`, `/faq`, `/contact` (all internal).
-- **Footer** — links to Product (5), Company (4), and Legal (4) pages, forming a full internal link graph.
-- **Section CTAs** — each home section links to its dedicated page (`/features`, `/pricing`, etc.) with `ArrowRight` icon.
-- **Cross-links** — `/pricing` links to `/faq` and `/contact`; `/features` links to `/pricing`; `/contact` links to `/pricing`.
-- **Blog pagination** — Prev/Next links use `rel="prev"` and `rel="next"` attributes. Page number links connect all pagination pages.
+A `PerformanceVitals` component is injected in the layout:
+
+- Tracks: **CLS**, **LCP**, **INP**, **FCP**, **TTFB** via `PerformanceObserver`
+- Logs metrics in development mode (`NODE_ENV === 'development'`)
+- Observes: `largest-contentful-paint`, `layout-shift`, `first-input`, `paint`, `navigation`
+- Architecture ready for analytics integration (replace `console.log` with API call)
+- No external analytics (no GA) — just uses native browser APIs
 
 ---
 
-## 11. Blog Pagination Structure
+## 13. External Link Security
+
+Audited the entire codebase for `target="_blank"` links. All instances include `rel="noopener noreferrer"`:
+
+| Location | Link | Secured |
+|---|---|---|
+| `Header.tsx` | LinkedIn social icon | `rel="noopener noreferrer"` |
+| `Footer.tsx` | LinkedIn icon | `rel="noopener noreferrer"` |
+| `Footer.tsx` | Twitter icon | `rel="noopener noreferrer"` |
+| `Footer.tsx` | LinkedIn footer link | `rel="noopener noreferrer"` |
+| `AuthorPage.tsx` | LinkedIn profile link | `rel="noopener noreferrer"` |
+
+---
+
+## 14. Social Profiles & Environment Support (`.env.example`)
+
+```env
+# Social Profiles
+NEXT_PUBLIC_LINKEDIN_URL=https://linkedin.com/company/reviucheck
+NEXT_PUBLIC_TWITTER_URL=https://twitter.com/reviucheck
+NEXT_PUBLIC_COMPANY_NAME=ReviuCheck
+NEXT_PUBLIC_SITE_URL=https://reviucheck.com
+
+# SEO Ratings (set to "true" when real data is available)
+NEXT_PUBLIC_SHOW_REAL_RATINGS=false
+NEXT_PUBLIC_RATING_VALUE=4.8
+NEXT_PUBLIC_RATING_COUNT=127
+
+# Google Search Console
+NEXT_PUBLIC_GOOGLE_VERIFICATION=your-verification-code
+```
+
+Organization, WebSite, and header/footer social links all consume these env vars with hardcoded fallbacks.
+
+---
+
+## 15. Internal Linking Structure
+
+- **Header** — links to `/features`, `/how-it-works`, `/pricing`, `/faq`, `/contact` + LinkedIn icon
+- **Footer** — Product (5), Company (4), Legal (4) pages + LinkedIn, Twitter, Email icons
+- **Section CTAs** — each home section links to its dedicated page
+- **Cross-links** — `/pricing` ↔ `/faq` ↔ `/contact`; `/features` ↔ `/pricing`; `/about` ↔ `/careers` ↔ `/contact`
+- **Blog pagination** — Prev/Next with `rel="prev/next"`, page number links
+- **Blog posts** — author names link to `/author/[slug]`, Related Articles at bottom
+- **404 page** — links to `/` and `/contact`
+
+---
+
+## 16. Blog Pagination Structure
 
 - `/blog` redirects (301) to `/blog/page/1`
 - `/blog/page/[page]` — paginated list with 10 posts per page
 - `rel="prev"` and `rel="next"` on adjacent page links
-- Pages > 3 are set to `noindex` to prevent thin content issues
+- Pages > 3 are set to `noindex` to prevent thin content
 - `generateStaticParams` pre-renders all 5 pages at build time
 
 ---
 
-## 12. 404 Page (`app/not-found.tsx`)
+## 17. 404 Page (`app/not-found.tsx`)
 
 A custom 404 page with:
 - `robots: { index: false }` to prevent indexing
-- Clear navigation options (Return Home, Contact Support)
-- Gradient text for the 404 heading
+- Gradient text "404" heading
+- "Return Home" and "Contact Support" navigation links
 - Same dark theme styling for consistent UX
 
 ---
 
-## 13. Verification
+## 18. Verification
 
 ```ts
 verification: {
@@ -294,13 +419,12 @@ Replace with your Google Search Console verification code.
 
 ---
 
-## 14. Future Improvements
+## 19. Future Improvements
 
 - [ ] Replace placeholder Open Graph image `/og-image.png` with a real branded image (1200×630).
-- [ ] Add `hreflang` tags for multi-region support if expanding globally.
+- [ ] Add `hreflang` tags for multi-region support.
 - [ ] Submit sitemap to Google Search Console and Bing Webmaster Tools.
-- [ ] Add `noopener noreferrer` on external links.
-- [ ] Set `NEXT_PUBLIC_SHOW_REAL_RATINGS=true` with real rating values when available.
+- [ ] Set `NEXT_PUBLIC_SHOW_REAL_RATINGS=true` with real rating values.
 - [ ] Implement server-side search for blog content.
 - [ ] Add video sitemap for any video content.
 - [ ] Set up Google Analytics / Search Console integration.
@@ -311,23 +435,24 @@ Replace with your Google Search Console verification code.
 
 | Route | Type | Title Template | OG Tags | JSON-LD | Static |
 |---|---|---|---|---|---|
-| `/` | Static | default | ✓ | SW App + Breadcrumb | ○ |
-| `/features` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
-| `/how-it-works` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
-| `/pricing` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
-| `/faq` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
-| `/about` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
-| `/blog` | Static | %s | ✓ | SW App | ○ (redirects) |
-| `/blog/page/[page]` | SSG | %s | ✓ | SW App + Breadcrumb | ● (5 pages) |
-| `/blog/[slug]` | SSG | %s | ✓ | SW App + Article + Breadcrumb | ● (6 posts) |
-| `/careers` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
-| `/contact` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
-| `/privacy` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
-| `/terms` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
-| `/security` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
-| `/gdpr` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
-| `/api-docs` | Static | %s | ✓ | SW App + Breadcrumb | ○ |
+| `/` | Static | default | ✓ | SW App + Org + WebSite + Breadcrumb | ○ |
+| `/features` | Static | %s | ✓ | + Breadcrumb | ○ |
+| `/how-it-works` | Static | %s | ✓ | + Breadcrumb | ○ |
+| `/pricing` | Static | %s | ✓ | + Breadcrumb | ○ |
+| `/faq` | Static | %s | ✓ | + Breadcrumb | ○ |
+| `/about` | Static | %s | ✓ | + Breadcrumb | ○ |
+| `/blog` | Static | %s | ✓ | Base schemas | ○ (redirects) |
+| `/blog/page/[page]` | SSG | %s | ✓ | + Breadcrumb | ● (5 pages) |
+| `/blog/[slug]` | SSG | %s | ✓ | + Article + Breadcrumb | ● (6 posts) |
+| `/author/[slug]` | SSG | %s | ✓ | + Person + Breadcrumb | ● (5 authors) |
+| `/careers` | Static | %s | ✓ | + Breadcrumb | ○ |
+| `/contact` | Static | %s | ✓ | + Breadcrumb | ○ |
+| `/privacy` | Static | %s | ✓ | + Breadcrumb | ○ |
+| `/terms` | Static | %s | ✓ | + Breadcrumb | ○ |
+| `/security` | Static | %s | ✓ | + Breadcrumb | ○ |
+| `/gdpr` | Static | %s | ✓ | + Breadcrumb | ○ |
+| `/api-docs` | Static | %s | ✓ | + Breadcrumb | ○ |
 | `/not-found` | Static | %s | - | - | ○ |
 | `/sitemap.xml` | Static | - | - | - | ○ |
 
-**Legend:** ○ = static, ● = SSG (uses `generateStaticParams`), SW App = SoftwareApplication
+**Legend:** ○ = static, ● = SSG (uses `generateStaticParams`), SW App = SoftwareApplication, Org = Organization

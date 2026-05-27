@@ -6,6 +6,7 @@ import SmoothScroll from '@/components/SmoothScroll'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
+import PerformanceVitals from '@/components/PerformanceVitals'
 
 const dosis = Dosis({
   subsets: ['latin'],
@@ -94,6 +95,34 @@ export default function RootLayout({
       </head>
       <body className="relative min-h-screen bg-background text-text-primary">
         <BreadcrumbSchema />
+        <PerformanceVitals />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: process.env.NEXT_PUBLIC_COMPANY_NAME || 'ReviuCheck',
+              url: process.env.NEXT_PUBLIC_SITE_URL || 'https://reviucheck.com',
+              logo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://reviucheck.com'}/divyaansh.png`,
+              sameAs: [
+                process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://linkedin.com/company/reviucheck',
+                process.env.NEXT_PUBLIC_TWITTER_URL || 'https://twitter.com/reviucheck',
+              ],
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              url: process.env.NEXT_PUBLIC_SITE_URL || 'https://reviucheck.com',
+              name: process.env.NEXT_PUBLIC_COMPANY_NAME || 'ReviuCheck',
+            }),
+          }}
+        />
         <Header />
         <SmoothScroll>
           <main className="min-h-screen">

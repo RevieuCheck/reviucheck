@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { X, Heart, ArrowUpRight } from 'lucide-react'
+import { Heart, ArrowUpRight, Mail } from 'lucide-react'
+import { FaLinkedin, FaTwitter } from 'react-icons/fa'
 
 const productLinks = [
   { name: 'Features', href: '/features' },
@@ -26,6 +27,9 @@ const legalLinks = [
 ]
 
 export default function Footer() {
+  const linkedinUrl = process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://linkedin.com/company/reviucheck'
+  const twitterUrl = process.env.NEXT_PUBLIC_TWITTER_URL || 'https://twitter.com/reviucheck'
+
   return (
     <footer className="bg-surface border-t border-primary/10 pt-16 pb-8">
       <div className="container mx-auto px-6">
@@ -41,8 +45,30 @@ export default function Footer() {
               Transforming customer feedback into actionable insights with AI-powered sentiment analysis, automated responses, and multi-language support.
             </p>
             <div className="flex gap-3 mt-6">
-              <a href="#" className="w-10 h-10 rounded-lg glass flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary/30 transition-all">
-                <X className="w-5 h-5" />
+              <a
+                href={linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-lg glass flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary/30 transition-all"
+                aria-label="LinkedIn"
+              >
+                <FaLinkedin className="w-5 h-5" />
+              </a>
+              <a
+                href={twitterUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-lg glass flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary/30 transition-all"
+                aria-label="Twitter"
+              >
+                <FaTwitter className="w-5 h-5" />
+              </a>
+              <a
+                href="mailto:divyaanshtandon09@gmail.com"
+                className="w-10 h-10 rounded-lg glass flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary/30 transition-all"
+                aria-label="Email"
+              >
+                <Mail className="w-5 h-5" />
               </a>
             </div>
           </div>
@@ -103,9 +129,19 @@ export default function Footer() {
           <p className="text-text-muted text-sm flex items-center gap-1">
             Made with <Heart className="w-4 h-4 text-primary" /> for better customer experiences
           </p>
-          <p className="text-text-muted text-sm">
-            &copy; {new Date().getFullYear()} ReviuCheck. All rights reserved.
-          </p>
+          <div className="flex items-center gap-4 text-sm text-text-muted">
+            <Link href="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-primary transition-colors">Terms</Link>
+            <a
+              href={linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary transition-colors"
+            >
+              LinkedIn
+            </a>
+            <p>&copy; {new Date().getFullYear()} ReviuCheck</p>
+          </div>
         </div>
       </div>
     </footer>
