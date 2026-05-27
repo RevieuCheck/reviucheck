@@ -2,9 +2,9 @@ import Hero from '@/components/Hero'
 import Features from '@/components/Features'
 import HowItWorks from '@/components/HowItWorks'
 import Pricing from '@/components/Pricing'
-import Testimonials from '@/components/Testimonials'
 import PreRegistration from '@/components/PreRegistration'
 import FAQ from '@/components/FAQ'
+import FounderSection from '@/components/FounderSection'
 
 export default function Home() {
   return (
@@ -17,8 +17,8 @@ export default function Home() {
       <Hero />
       <Features />
       <HowItWorks />
+      <FounderSection />
       <Pricing />
-      {/* <Testimonials /> */}
       <PreRegistration />
       <FAQ />
     </>

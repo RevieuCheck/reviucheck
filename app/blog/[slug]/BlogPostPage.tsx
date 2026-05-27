@@ -1,10 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Calendar, User, Clock, ArrowLeft, Tag, ArrowRight } from 'lucide-react'
+import { Calendar, User, Clock, ArrowLeft, Tag, ArrowRight, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
-import { getAuthorByName, getAuthorBySlug } from '@/lib/authors'
+import { getAuthorByName } from '@/lib/authors'
 import { getRelatedPosts } from '@/lib/internalLinks'
+import { blogContent } from '@/lib/blogContent'
 
 interface PostData {
   slug: string
@@ -41,6 +42,7 @@ export default function BlogPostPage({ post }: BlogPostPageProps) {
   const authorData = getAuthorByName(post.author)
   const authorSlug = authorData?.slug || (post.author === 'ReviuCheck Team' ? 'team' : null)
   const relatedPosts = getRelatedPosts(post.slug, 3)
+  const content = blogContent[post.slug]
 
   return (
     <>
@@ -117,31 +119,36 @@ export default function BlogPostPage({ post }: BlogPostPageProps) {
                 {post.excerpt}
               </p>
 
-              <div className="glass rounded-2xl p-8 mb-8">
-                <p className="text-text-secondary leading-relaxed">
-                  This is a sample blog post. In production, this content would be fetched from your CMS or database.
-                  The Article schema is already in place for SEO. Each post includes structured data for
-                  headline, author, publish date, and last modified date.
-                </p>
-              </div>
+              {content && content.sections.map((section, i) => (
+                <div key={i} className="mb-10">
+                  <h2 className="text-2xl font-bold font-heading text-text-primary mb-4">{section.title}</h2>
+                  <p className="text-text-secondary leading-relaxed mb-4">{section.content}</p>
+                  {section.list && (
+                    <ul className="space-y-3">
+                      {section.list.map((item, j) => (
+                        <li key={j} className="flex items-start gap-3 text-text-secondary">
+                          <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
 
-              <div className="glass rounded-2xl p-8 mb-8">
-                <h2 className="text-2xl font-bold font-heading text-text-primary mb-4">Key Takeaways</h2>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-3 text-text-secondary">
-                    <Tag className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>AI-powered sentiment analysis helps businesses understand customer emotions at scale</span>
-                  </li>
-                  <li className="flex items-start gap-3 text-text-secondary">
-                    <Tag className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Automated responses save teams up to 70% of their review management time</span>
-                  </li>
-                  <li className="flex items-start gap-3 text-text-secondary">
-                    <Tag className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Multi-language support breaks down communication barriers with global customers</span>
-                  </li>
-                </ul>
-              </div>
+              {content && content.takeaways && (
+                <div className="glass rounded-2xl p-8 mt-8">
+                  <h2 className="text-2xl font-bold font-heading text-text-primary mb-4">Key Takeaways</h2>
+                  <ul className="space-y-3">
+                    {content.takeaways.map((takeaway, i) => (
+                      <li key={i} className="flex items-start gap-3 text-text-secondary">
+                        <Tag className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span>{takeaway}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </motion.div>
 
             {relatedPosts.length > 0 && (

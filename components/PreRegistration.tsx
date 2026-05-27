@@ -121,7 +121,7 @@ export default function PreRegistration() {
                         <input
                           {...register('full_name')}
                           className="w-full px-4 py-2.5 bg-surface border border-primary/10 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent text-text-primary placeholder:text-text-muted text-sm transition-all"
-                          placeholder="John Doe"
+                          placeholder="Your full name"
                         />
                         {errors.full_name && <p className="text-red-400 text-xs mt-1">{errors.full_name.message}</p>}
                       </div>

@@ -1,10 +1,29 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Check, Zap, Building, Rocket, ArrowRight, HelpCircle } from 'lucide-react'
+import { Check, Zap, Building, Rocket, ArrowRight, HelpCircle, Leaf } from 'lucide-react'
 import Link from 'next/link'
 
 const plans = [
+  {
+    name: 'Micro',
+    icon: Leaf,
+    price: '$9',
+    period: 'month',
+    credits: '50',
+    description: 'Perfect for freelancers and small shops just getting started.',
+    features: [
+      '50 review credits/month',
+      'Basic sentiment analysis',
+      'AI response suggestions',
+      'Email support',
+      'Basic dashboard',
+      '7-day data retention',
+    ],
+    gradient: 'from-primary to-purple-600',
+    highlighted: false,
+    cta: 'Start Free Trial',
+  },
   {
     name: 'Starter',
     icon: Zap,
@@ -70,20 +89,20 @@ const plans = [
 ]
 
 const comparisons = [
-  { feature: 'Review Credits', starter: '1,000/mo', pro: '5,000/mo', enterprise: 'Unlimited' },
-  { feature: 'Sentiment Analysis', starter: true, pro: true, enterprise: true },
-  { feature: 'Emotion Detection', starter: false, pro: true, enterprise: true },
-  { feature: 'AI Response Generation', starter: 'Basic', pro: 'Advanced', enterprise: 'Custom' },
-  { feature: 'Spam Detection', starter: false, pro: true, enterprise: true },
-  { feature: 'Sarcasm Detection', starter: false, pro: true, enterprise: true },
-  { feature: 'Multi-Language', starter: '5 languages', pro: '10 languages', enterprise: '100+ languages' },
-  { feature: 'Duplicate Detection', starter: false, pro: true, enterprise: true },
-  { feature: 'Custom AI Training', starter: false, pro: false, enterprise: true },
-  { feature: 'Data Retention', starter: '7 days', pro: '30 days', enterprise: 'Unlimited' },
-  { feature: 'Support', starter: 'Email', pro: 'Priority', enterprise: '24/7 Dedicated' },
-  { feature: 'API Access', starter: false, pro: true, enterprise: true },
-  { feature: 'SSO', starter: false, pro: false, enterprise: true },
-  { feature: 'On-Premise', starter: false, pro: false, enterprise: true },
+  { feature: 'Review Credits', micro: '50/mo', starter: '1,000/mo', pro: '5,000/mo', enterprise: 'Unlimited' },
+  { feature: 'Sentiment Analysis', micro: true, starter: true, pro: true, enterprise: true },
+  { feature: 'Emotion Detection', micro: false, starter: false, pro: true, enterprise: true },
+  { feature: 'AI Response Generation', micro: 'Basic', starter: 'Basic', pro: 'Advanced', enterprise: 'Custom' },
+  { feature: 'Spam Detection', micro: false, starter: false, pro: true, enterprise: true },
+  { feature: 'Sarcasm Detection', micro: false, starter: false, pro: true, enterprise: true },
+  { feature: 'Multi-Language', micro: '3 languages', starter: '5 languages', pro: '10 languages', enterprise: '100+ languages' },
+  { feature: 'Duplicate Detection', micro: false, starter: false, pro: true, enterprise: true },
+  { feature: 'Custom AI Training', micro: false, starter: false, pro: false, enterprise: true },
+  { feature: 'Data Retention', micro: '7 days', starter: '7 days', pro: '30 days', enterprise: 'Unlimited' },
+  { feature: 'Support', micro: 'Email', starter: 'Email', pro: 'Priority', enterprise: '24/7 Dedicated' },
+  { feature: 'API Access', micro: false, starter: false, pro: true, enterprise: true },
+  { feature: 'SSO', micro: false, starter: false, pro: false, enterprise: true },
+  { feature: 'On-Premise', micro: false, starter: false, pro: false, enterprise: true },
 ]
 
 export default function PricingPage() {
@@ -114,7 +133,7 @@ export default function PricingPage() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
             {plans.map((plan, index) => (
               <motion.div
                 key={plan.name}
@@ -199,15 +218,23 @@ export default function PricingPage() {
               <thead>
                 <tr className="border-b border-primary/10">
                   <th className="py-4 px-4 text-text-primary font-heading font-bold">Feature</th>
+                  <th className="py-4 px-4 text-text-primary font-heading font-bold">Micro</th>
                   <th className="py-4 px-4 text-text-primary font-heading font-bold">Starter</th>
                   <th className="py-4 px-4 text-text-primary font-heading font-bold text-primary">Professional</th>
                   <th className="py-4 px-4 text-text-primary font-heading font-bold">Enterprise</th>
                 </tr>
               </thead>
               <tbody>
-                {comparisons.map((row, i) => (
+                  {comparisons.map((row, i) => (
                   <tr key={row.feature} className="border-b border-primary/5 hover:bg-primary/5 transition-colors">
                     <td className="py-4 px-4 text-text-secondary">{row.feature}</td>
+                    <td className="py-4 px-4">
+                      {typeof row.micro === 'boolean' ? (
+                        row.micro ? <Check className="w-4 h-4 text-primary" /> : <span className="text-text-muted">&mdash;</span>
+                      ) : (
+                        <span className="text-text-secondary text-sm">{row.micro}</span>
+                      )}
+                    </td>
                     <td className="py-4 px-4">
                       {typeof row.starter === 'boolean' ? (
                         row.starter ? <Check className="w-4 h-4 text-primary" /> : <span className="text-text-muted">&mdash;</span>

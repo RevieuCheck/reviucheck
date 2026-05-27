@@ -1,10 +1,28 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Check, Zap, Building, Rocket, ArrowRight } from 'lucide-react'
+import { Check, Zap, Building, Rocket, ArrowRight, Leaf } from 'lucide-react'
 import Link from 'next/link'
 
 const plans = [
+  {
+    name: 'Micro',
+    icon: Leaf,
+    price: '$9',
+    period: 'month',
+    credits: '50',
+    description: 'Perfect for freelancers and small shops just getting started.',
+    features: [
+      '50 review credits/month',
+      'Basic sentiment analysis',
+      'AI response suggestions',
+      'Email support',
+      'Basic dashboard',
+      '7-day data retention',
+    ],
+    gradient: 'from-primary to-purple-600',
+    popular: false,
+  },
   {
     name: 'Starter',
     icon: Zap,
@@ -88,7 +106,7 @@ export default function Pricing() {
           <p className="text-lg text-text-secondary">No hidden fees. Upgrade or cancel anytime.</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}

@@ -93,7 +93,7 @@ export default function RootLayout({
       <head>
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
       </head>
-      <body className="relative min-h-screen bg-background text-text-primary">
+      <body className="relative min-h-screen bg-background text-text-primary flex flex-col">
         <BreadcrumbSchema />
         <PerformanceVitals />
         <script
@@ -125,7 +125,7 @@ export default function RootLayout({
         />
         <Header />
         <SmoothScroll>
-          <main className="min-h-screen">
+          <main className="flex-1">
             {children}
           </main>
         </SmoothScroll>
